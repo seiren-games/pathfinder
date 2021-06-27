@@ -59,6 +59,19 @@ class Pathfinder
 	 */
 	public function new( p_map:IMap, p_timeOutDuration:Int = 10000 )
 	{
+		// Initialize in Constructor
+		_map = p_map;
+		_timeOutDuration = 0;
+		_openList = [];
+		_closedList = [];
+		_isCompleted = false;
+		_nodes = [];
+		_startNode = new Node(0, 0);
+		_destNode = new Node(0, 0);
+		_cols = 0;
+		_rows = 0;
+		_info = {heuristic:EHeuristic.PRODUCT, timeElapsed:0, pathLength:0, isDiagonalEnabled:true}
+
 		configure( p_map, p_timeOutDuration );
 	}
 
@@ -137,7 +150,7 @@ class Pathfinder
 	 * @param	p_isMapDynamic	Set to true to force fresh lookups from IMap.isWalkable() for each node's isWalkable property (e.g. for a dynamically changing map)
 	 * @return	An array of coordinates from start to destination, or null if no path was found within the time limit
 	 */
-	public function createPath( p_start:Coordinate, p_dest:Coordinate, ?p_heuristic:EHeuristic, p_isDiagonalEnabled:Bool = true, p_isMapDynamic:Bool = false ):Array<Coordinate>
+	public function createPath( p_start:Coordinate, p_dest:Coordinate, ?p_heuristic:EHeuristic, p_isDiagonalEnabled:Bool = true, p_isMapDynamic:Bool = false ):Null<Array<Coordinate>>
 	{
 		if ( p_heuristic == null )
 		{
@@ -171,7 +184,7 @@ class Pathfinder
 		l_path[0] = l_node.clone();
 		do
 		{
-			l_node = l_node.parent;
+			l_node = Safety.sure(l_node.parent);
 			l_path.unshift( l_node.clone() );
 			if ( l_node == _startNode )
 			{
@@ -182,12 +195,12 @@ class Pathfinder
 		return l_path;
 	}
 
-	private function _searchPath( p_heuristic:EHeuristic, p_isDiagonalEnabled:Bool = true, p_isMapDynamic:Bool = false ):Array<Coordinate>
+	private function _searchPath( p_heuristic:EHeuristic, p_isDiagonalEnabled:Bool = true, p_isMapDynamic:Bool = false ):Null<Array<Coordinate>>
 	{
 		var l_minX:Int, l_maxX:Int, l_minY:Int, l_maxY:Int;
 		var l_isWalkable:Bool;
 		var l_g:Float, l_f:Float, l_cost:Float;
-		var l_nextNode:Node = null;
+		var l_nextNode:Node = new Node(0, 0);
 		var l_currentNode:Node = _startNode;
 		var l_startTime = Timer.stamp();
 		_isCompleted = false;
@@ -247,7 +260,7 @@ class Pathfinder
 				return null;
 			}
 			_openList.sort( _sort );
-			l_currentNode = _openList.shift();
+			l_currentNode = Safety.sure(_openList.shift());
 			if ( l_currentNode == _destNode )
 			{
 				_isCompleted = true;

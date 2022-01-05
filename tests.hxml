@@ -1,0 +1,11 @@
+--main Main
+--hl bin/main.hl
+--debug
+
+--class-path test
+--class-path lib
+--library safety
+
+--macro nullSafety("pathfinder", Strict)
+
+--cmd hl bin/main.hl

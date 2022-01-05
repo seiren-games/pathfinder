@@ -35,10 +35,10 @@ package pathfinder;
 
 class Node extends Coordinate
 {
-	public var parent:Node;
+	public var parent:Null<Node>;
 	public var isWalkable:Bool;
-	public var f:Float;
-	public var g:Float;
+	public var f:Float = 0;
+	public var g:Float = 0;
 
 	public function new( p_x:Int, p_y:Int, p_isWalkable:Bool = true )
 	{
